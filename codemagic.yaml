@@ -1,0 +1,23 @@
+workflows:
+  ios-workflow:
+    name: Intake on-the-Go iOS
+    max_build_duration: 60
+    environment:
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Install CocoaPods
+        script: |
+          cd "Intake on-the-Go/src"
+          pod install
+      - name: Build iOS
+        script: |
+          cd "Intake on-the-Go/src"
+          xcode-project use-profiles
+          xcodebuild -workspace "Intake on-the-Go.xcworkspace" \
+            -scheme "Intake on-the-Go" \
+            -configuration Release \
+            -archivePath build/Intake-on-the-Go.xcarchive \
+            archive
+    artifacts:
+      - build/Intake-on-the-Go.xcarchive
