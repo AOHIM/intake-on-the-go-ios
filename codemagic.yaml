@@ -1,4 +1,3 @@
-
 workflows:
   ios-workflow:
     name: Intake on-the-Go iOS
@@ -6,9 +5,8 @@ workflows:
     environment:
       xcode: latest
       cocoapods: default
-      vars:
-        APP_STORE_CONNECT_ISSUER_ID: "2cc1b994-49d1-4b7a-9d18-767f2f0d947f"
-        APP_STORE_CONNECT_KEY_IDENTIFIER: "3FQWFK9UTA"
+      groups:
+        - app_store_credentials
     scripts:
       - name: Unzip project
         script: |
