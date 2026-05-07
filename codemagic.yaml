@@ -12,7 +12,7 @@ workflows:
     scripts:
       - name: Unzip project
         script: |
-          unzip "Intake_on-the-Go_fixed.zip"
+          unzip "Intake_on-the-Go_fixed 05-06-26.zip"
       - name: Install CocoaPods
         script: |
           cd src
