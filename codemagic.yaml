@@ -40,6 +40,8 @@ workflows:
             -archivePath build/Intake-on-the-Go.xcarchive \
             DEVELOPMENT_TEAM=8L559HD8N \
             CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="Intake on-the-Go Distribution" \
+            CODE_SIGN_IDENTITY="iPhone Distribution" \
             archive
     artifacts:
       - src/build/Intake-on-the-Go.xcarchive
