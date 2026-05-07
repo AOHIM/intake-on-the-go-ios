@@ -38,6 +38,8 @@ workflows:
             -scheme "Intake on-the-Go" \
             -configuration Release \
             -archivePath build/Intake-on-the-Go.xcarchive \
+            DEVELOPMENT_TEAM=8L559HD8N \
+            CODE_SIGN_STYLE=Manual \
             archive
     artifacts:
       - src/build/Intake-on-the-Go.xcarchive
