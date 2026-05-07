@@ -31,50 +31,25 @@ workflows:
         script: |
           cd src
           xcode-project use-profiles
-      - name: Build and Export IPA
+      - name: Build iOS
         script: |
-          # Find the keychain and set it as default
-          KEYCHAIN=$(ls ~/Library/codemagic-cli-tools/keychains/*.keychain-db | head -1)
-          echo "Using keychain: $KEYCHAIN"
-          security list-keychains -s "$KEYCHAIN" ~/Library/Keychains/login.keychain-db
-          security default-keychain -s "$KEYCHAIN"
-          security unlock-keychain -p "" "$KEYCHAIN"
-
-          cat > /tmp/ExportOptions.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store-connect</string>
-            <key>teamID</key>
-            <string>8L559HD8N</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>org.aohministry.intakeonthego</key>
-              <string>Intake on-the-Go Distribution</string>
-            </dict>
-            <key>uploadSymbols</key>
-            <true/>
-            <key>compileBitcode</key>
-            <false/>
-          </dict>
-          </plist>
-          EOF
-
           cd src
           xcodebuild -workspace "Intake on-the-Go.xcworkspace" \
             -scheme "Intake on-the-Go" \
             -configuration Release \
             -archivePath build/Intake-on-the-Go.xcarchive \
             archive
-
+      - name: Export IPA
+        script: |
+          cd src
           xcodebuild -exportArchive \
             -archivePath build/Intake-on-the-Go.xcarchive \
             -exportPath build/ipa \
-            -exportOptionsPlist /tmp/ExportOptions.plist
+            -exportOptionsPlist build/Intake-on-the-Go.xcarchive/Info.plist
     artifacts:
       - src/build/ipa/*.ipa
       - src/build/Intake-on-the-Go.xcarchive
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
