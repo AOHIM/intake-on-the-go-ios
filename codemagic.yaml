@@ -1,3 +1,4 @@
+
 workflows:
   ios-workflow:
     name: Intake on-the-Go iOS
@@ -31,49 +32,17 @@ workflows:
         script: |
           cd src
           xcode-project use-profiles
-      - name: Build and Export IPA
+      - name: Build IPA
         script: |
-          PROFILE=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -1)
-          echo "Using profile: $PROFILE"
-          
-          cat > /tmp/ExportOptions.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store-connect</string>
-            <key>teamID</key>
-            <string>8L559HD8N</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>signingCertificate</key>
-            <string>0B33DFE012D99199D9E5BB198103229AF5B966BA</string>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>org.aohministry.intakeonthego</key>
-              <string>Intake on-the-Go Distribution</string>
-            </dict>
-            <key>uploadSymbols</key>
-            <true/>
-            <key>compileBitcode</key>
-            <false/>
-          </dict>
-          </plist>
-          EOF
-
           cd src
-          xcodebuild -workspace "Intake on-the-Go.xcworkspace" \
-            -scheme "Intake on-the-Go" \
-            -configuration Release \
-            -archivePath build/Intake-on-the-Go.xcarchive \
-            archive
-
-          xcodebuild -exportArchive \
-            -archivePath build/Intake-on-the-Go.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist /tmp/ExportOptions.plist \
-            OTHER_CODE_SIGN_FLAGS="--keychain ~/Library/codemagic-cli-tools/keychains/$(ls ~/Library/codemagic-cli-tools/keychains/ | head -1)"
+          xcode-project build-ipa \
+            --workspace "Intake on-the-Go.xcworkspace" \
+            --scheme "Intake on-the-Go"
     artifacts:
-      - src/build/ipa/*.ipa
-      - src/build/Intake-on-the-Go.xcarchive
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+        submit_to_app_store: false
