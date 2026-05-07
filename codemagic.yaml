@@ -1,3 +1,4 @@
+
 workflows:
   ios-workflow:
     name: Intake on-the-Go iOS
@@ -39,5 +40,17 @@ workflows:
             -configuration Release \
             -archivePath build/Intake-on-the-Go.xcarchive \
             archive
+      - name: Export IPA
+        script: |
+          cd src
+          xcodebuild -exportArchive \
+            -archivePath build/Intake-on-the-Go.xcarchive \
+            -exportPath build/ipa \
+            -exportOptionsPlist /Users/builder/clone/src/ExportOptions.plist || \
+          xcodebuild -exportArchive \
+            -archivePath build/Intake-on-the-Go.xcarchive \
+            -exportPath build/ipa \
+            -allowProvisioningUpdates
     artifacts:
+      - src/build/ipa/*.ipa
       - src/build/Intake-on-the-Go.xcarchive
