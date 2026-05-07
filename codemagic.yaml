@@ -38,8 +38,11 @@ workflows:
           xcode-project build-ipa \
             --workspace "Intake on-the-Go.xcworkspace" \
             --scheme "Intake on-the-Go"
+          echo "=== FINDING IPA FILES ==="
+          find /Users/builder -name "*.ipa" 2>/dev/null
+          find /Users/builder/clone -name "*.ipa" 2>/dev/null
     artifacts:
-      - build/ios/ipa/*.ipa
+      - "**/*.ipa"
       - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
