@@ -1,4 +1,3 @@
-
 workflows:
   ios-workflow:
     name: Intake on-the-Go iOS
@@ -13,7 +12,7 @@ workflows:
     scripts:
       - name: Unzip project
         script: |
-          unzip "Intake_on-the-Go_fixed 05-06-26.zip"
+          unzip "Intake_on-the-Go_fixed2.zip"
       - name: Install CocoaPods
         script: |
           cd src
@@ -38,9 +37,6 @@ workflows:
           xcode-project build-ipa \
             --workspace "Intake on-the-Go.xcworkspace" \
             --scheme "Intake on-the-Go"
-          echo "=== FINDING IPA FILES ==="
-          find /Users/builder -name "*.ipa" 2>/dev/null
-          find /Users/builder/clone -name "*.ipa" 2>/dev/null
     artifacts:
       - "**/*.ipa"
       - /tmp/xcodebuild_logs/*.log
