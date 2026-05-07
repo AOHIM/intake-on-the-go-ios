@@ -33,6 +33,13 @@ workflows:
           xcode-project use-profiles
       - name: Build and Export IPA
         script: |
+          # Find the keychain and set it as default
+          KEYCHAIN=$(ls ~/Library/codemagic-cli-tools/keychains/*.keychain-db | head -1)
+          echo "Using keychain: $KEYCHAIN"
+          security list-keychains -s "$KEYCHAIN" ~/Library/Keychains/login.keychain-db
+          security default-keychain -s "$KEYCHAIN"
+          security unlock-keychain -p "" "$KEYCHAIN"
+
           cat > /tmp/ExportOptions.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -56,12 +63,14 @@ workflows:
           </dict>
           </plist>
           EOF
+
           cd src
           xcodebuild -workspace "Intake on-the-Go.xcworkspace" \
             -scheme "Intake on-the-Go" \
             -configuration Release \
             -archivePath build/Intake-on-the-Go.xcarchive \
             archive
+
           xcodebuild -exportArchive \
             -archivePath build/Intake-on-the-Go.xcarchive \
             -exportPath build/ipa \
