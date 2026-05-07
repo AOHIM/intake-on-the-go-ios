@@ -1,3 +1,4 @@
+
 workflows:
   ios-workflow:
     name: Intake on-the-Go iOS
@@ -31,7 +32,15 @@ workflows:
         script: |
           cd src
           xcode-project use-profiles
-      - name: Build and Export IPA
+      - name: Build iOS
+        script: |
+          cd src
+          xcodebuild -workspace "Intake on-the-Go.xcworkspace" \
+            -scheme "Intake on-the-Go" \
+            -configuration Release \
+            -archivePath build/Intake-on-the-Go.xcarchive \
+            archive
+      - name: Export IPA
         script: |
           cat > /tmp/ExportOptions.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
@@ -43,12 +52,7 @@ workflows:
             <key>teamID</key>
             <string>8L559HD8N</string>
             <key>signingStyle</key>
-            <string>manual</string>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>org.aohministry.intakeonthego</key>
-              <string>Intake on-the-Go Distribution</string>
-            </dict>
+            <string>automatic</string>
             <key>uploadSymbols</key>
             <true/>
             <key>compileBitcode</key>
@@ -57,15 +61,11 @@ workflows:
           </plist>
           EOF
           cd src
-          xcodebuild -workspace "Intake on-the-Go.xcworkspace" \
-            -scheme "Intake on-the-Go" \
-            -configuration Release \
-            -archivePath build/Intake-on-the-Go.xcarchive \
-            archive
           xcodebuild -exportArchive \
             -archivePath build/Intake-on-the-Go.xcarchive \
             -exportPath build/ipa \
-            -exportOptionsPlist /tmp/ExportOptions.plist
+            -exportOptionsPlist /tmp/ExportOptions.plist \
+            -allowProvisioningUpdates
     artifacts:
       - src/build/ipa/*.ipa
       - src/build/Intake-on-the-Go.xcarchive
