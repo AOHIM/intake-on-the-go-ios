@@ -10,9 +10,6 @@ workflows:
       cocoapods: default
       groups:
         - app_store_credentials
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: org.aohministry.intakeonthego
     scripts:
       - name: Unzip project
         script: |
@@ -21,25 +18,34 @@ workflows:
         script: |
           cd src
           pod install
-      - name: Build iOS
+      - name: Set up keychain
+        script: keychain initialize
+      - name: Fetch signing files
+        script: |
+          app-store-connect fetch-signing-files \
+            org.aohministry.intakeonthego \
+            --type IOS_APP_STORE \
+            --create
+      - name: Add certificates
+        script: keychain add-certificates
+      - name: Check available certs and profiles
+        script: |
+          echo "=== CERTIFICATES ==="
+          security find-identity -v -p codesigning
+          echo "=== PROFILES ==="
+          ls ~/Library/MobileDevice/Provisioning\ Profiles/ 2>/dev/null || echo "No profiles directory"
+          ls ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/ 2>/dev/null || echo "No Xcode profiles directory"
+      - name: Set up code signing
+        script: |
+          cd src
+          xcode-project use-profiles
+      - name: Build and Export IPA
         script: |
           cd src
           xcodebuild -workspace "Intake on-the-Go.xcworkspace" \
             -scheme "Intake on-the-Go" \
             -configuration Release \
             -archivePath build/Intake-on-the-Go.xcarchive \
-            -allowProvisioningUpdates \
             archive
-      - name: Export IPA
-        script: |
-          cd src
-          xcode-project build-ipa \
-            --workspace "Intake on-the-Go.xcworkspace" \
-            --scheme "Intake on-the-Go"
     artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-    publishing:
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: false
+      - src/build/Intake-on-the-Go.xcarchive
