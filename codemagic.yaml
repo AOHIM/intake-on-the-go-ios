@@ -12,7 +12,23 @@ workflows:
     scripts:
       - name: Unzip project
         script: |
-          unzip "Intake_on-the-Go_fixed2.zip"
+          unzip *.zip
+      - name: Fix app icon alpha channel
+        script: |
+          ICON_PATH="src/Intake on-the-Go/Assets.xcassets/AppIcon.appiconset/1024.png"
+          python3 -c "
+from PIL import Image
+img = Image.open('$ICON_PATH')
+if img.mode in ('RGBA', 'LA', 'P'):
+    bg = Image.new('RGB', img.size, (255, 255, 255))
+    if img.mode == 'P':
+        img = img.convert('RGBA')
+    bg.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+    bg.save('$ICON_PATH', 'PNG')
+    print('Icon fixed')
+else:
+    print('No fix needed')
+"
       - name: Install CocoaPods
         script: |
           cd src
