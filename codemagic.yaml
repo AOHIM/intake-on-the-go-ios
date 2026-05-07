@@ -12,15 +12,11 @@ workflows:
     scripts:
       - name: Unzip project
         script: |
-          unzip "Intake on-the-Go.zip"
+          unzip "Intake_on-the-Go_fixed.zip"
       - name: Install CocoaPods
         script: |
           cd src
           pod install
-      - name: Fix Bundle ID
-        script: |
-          cd src
-          sed -i '' 's/org.aohministry.intake[^o]/org.aohministry.intakeonthego/g' "Intake on-the-Go.xcodeproj/project.pbxproj"
       - name: Set up keychain
         script: keychain initialize
       - name: Fetch signing files
@@ -42,9 +38,6 @@ workflows:
             -scheme "Intake on-the-Go" \
             -configuration Release \
             -archivePath build/Intake-on-the-Go.xcarchive \
-            DEVELOPMENT_TEAM=8L559HD8N \
-            PRODUCT_BUNDLE_IDENTIFIER=org.aohministry.intakeonthego \
-            CODE_SIGN_STYLE=Manual \
             archive
     artifacts:
       - src/build/Intake-on-the-Go.xcarchive
